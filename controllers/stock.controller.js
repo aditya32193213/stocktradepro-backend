@@ -1,0 +1,32 @@
+import {
+  getStocksService,
+  getStockByIdService
+} from "../services/index.js";
+
+/**
+ * -----------------------------------------------------
+ * Get All Stocks
+ * -----------------------------------------------------
+ */
+export const getAllStocks = async (req, res, next) => {
+  try {
+    const result = await getStocksService(req.query);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * -----------------------------------------------------
+ * Get Stock By ID
+ * -----------------------------------------------------
+ */
+export const getStockById = async (req, res, next) => {
+  try {
+    const stock = await getStockByIdService(req.params.id);
+    res.json(stock);
+  } catch (error) {
+    next(error);
+  }
+};
