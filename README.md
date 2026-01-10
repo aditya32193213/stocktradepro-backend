@@ -30,7 +30,7 @@ Designed using industry-standard backend practices with a modular, scalable arch
 ---
 
 # 🌐 Live Backend API  
-- 🔗 **[https://ecommerce-backend-hen7.onrender.com](https://ecommerce-backend-hen7.onrender.com)**
+- 🔗 **[https://stocktradepro-backend.onrender.com/](https://stocktradepro-backend.onrender.com/)**
 
 ---
 
@@ -188,8 +188,8 @@ JWT_SECRET=your_secret_key
 
 ## 1️⃣ Clone the Repository
 ```bash
-git clone https://github.com/aditya32193213/ecommerce-backend.git
-cd StockTradePro-backend
+git clone https://github.com/aditya32193213/stocktradepro-backend.git
+cd Stocktradepro-backend
 ```
 
 ## 📦 Install dependencies

@@ -14,7 +14,7 @@ const swaggerDefinition = {
   openapi: "3.0.0",
 
   info: {
-    title: "StockTradePro API",
+    title: "StockTradePro API Documentation",
     version: "1.0.0",
     description:
       "API documentation for StockTradePro – a fintech stock trading platform"
@@ -29,7 +29,11 @@ const swaggerDefinition = {
   servers: [
     {
       url: "http://localhost:10000",
-      description: "Development server"
+      description: "Local Development server"
+    },
+    {
+        url: "https://stocktradepro-backend.onrender.com/",
+        description: "Production Server",
     }
   ],
 

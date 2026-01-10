@@ -49,6 +49,11 @@ app.use("/api", apiRoutes);
 // Swagger API documentation
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// Root Route
+app.get("/", (req, res) => {
+  res.send("Welcome to the StockTradePro API 🚀");
+});
+
 /**
  * -----------------------------------------------------
  * Global Error Handler
