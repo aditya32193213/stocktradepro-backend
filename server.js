@@ -49,10 +49,10 @@ const startServer = async () => {
     //  Start HTTP server
     server = app.listen(PORT, () => {
       logger.info("🚀 Server started successfully");
-      logger.info(`🌐 Base URL: ${BASE_URL}`);
-      logger.info(`📘 API Docs: ${BASE_URL}/api-docs`);
-      logger.info(`❤️  Health Check: ${BASE_URL}/api/v1/health`);
-    });
+      logger.info("🌐 Base URL", { url: BASE_URL });
+      logger.info("📘 API Docs", {url: `${BASE_URL}/api-docs`,});
+      logger.info("❤️ Health Check", {url: `${BASE_URL}/api/v1/health`,});
+});
   } catch (error) {
     logger.error("❌ Failed to start server", error);
     process.exit(1);
