@@ -19,7 +19,8 @@ export const registerValidation = [
     .trim()
     .isEmail()
     .withMessage("Valid email required")
-    .normalizeEmail(),
+    .toLowerCase(),
+    //.normalizeEmail(),
 
   body("mobile")
     .trim()
