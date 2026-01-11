@@ -26,7 +26,6 @@
  */
 const sanitize = (value) => {
   if (typeof value === "string") {
-    // Remove MongoDB operator characters
     return value.replace(/\$|\./g, "");
   }
   return value;
@@ -39,14 +38,11 @@ const sanitize = (value) => {
  * @param {Object} obj - Object to sanitize
  */
 const sanitizeObject = (obj) => {
-  // Exit early if value is null, undefined, or not an object
   if (!obj || typeof obj !== "object") return;
 
   for (const key in obj) {
-    // Sanitize the current value
     obj[key] = sanitize(obj[key]);
 
-    // Recursively sanitize nested objects
     if (typeof obj[key] === "object") {
       sanitizeObject(obj[key]);
     }
@@ -67,21 +63,27 @@ const sanitizeObject = (obj) => {
  * This design prevents runtime errors and keeps the app secure.
  */
 const mongoSanitizeMiddleware = (req, res, next) => {
+  // Safe to mutate
   sanitizeObject(req.body);
   sanitizeObject(req.params);
-  
-  // Handle query params (create new object to avoid read-only issues)
+
+  // ❌ DO NOT TOUCH req.query
+  // ✅ Create a new sanitized copy
   if (req.query && Object.keys(req.query).length > 0) {
     const sanitizedQuery = {};
+
     for (const key in req.query) {
       sanitizedQuery[key] = sanitize(req.query[key]);
-      if (typeof req.query[key] === 'object') {
+
+      if (typeof req.query[key] === "object") {
         sanitizeObject(sanitizedQuery[key]);
       }
     }
-    req.query = sanitizedQuery;
+
+    // Attach safely
+    req.sanitizedQuery = sanitizedQuery;
   }
-  
+
   next();
 };
 

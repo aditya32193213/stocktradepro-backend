@@ -10,7 +10,8 @@ import {
  */
 export const getAllStocks = async (req, res, next) => {
   try {
-    const result = await getStocksService(req.query);
+    const query = req.sanitizedQuery ?? req.query;
+    const result = await getStocksService(query);
     res.status(200).json(result);
   } catch (error) {
     next(error);
