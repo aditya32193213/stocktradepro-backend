@@ -87,3 +87,15 @@ router.post("/register", registerValidation, validate, registerUser);
 router.post("/login", authLimiter, loginValidation, validate, loginUser);
 
 export default router;
+
+
+
+
+
+
+
+
+
+
+
+

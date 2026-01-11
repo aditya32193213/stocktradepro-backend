@@ -20,7 +20,6 @@ app.use(requestId);
  */
 app.set("trust proxy", 1);
 
-app.enable('trust proxy'); // Tells express to trust X-Forwarded-* headers
 
 /**
  * -----------------------------------------------------

@@ -265,10 +265,6 @@ Includes a deterministic & realistic seeding system:
 2. Supertest
 
 - ✅ Tested flows:
-- 🔐 Authentication
-- 🚫 Rate limiting
-- 💸 Transactions
-- 💰 Balance updates
 - ✅ Health endpoint
 - Minimal Jest setup
 

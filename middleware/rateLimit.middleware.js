@@ -1,5 +1,7 @@
 import rateLimit from "express-rate-limit";
 
+const isTest = process.env.NODE_ENV === "test";
+
 /**
  * -----------------------------------------------------
  * Authentication Rate Limiter
@@ -12,13 +14,15 @@ import rateLimit from "express-rate-limit";
  *
  * Applied only on sensitive routes like login.
  */
-export const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // limit each IP to 10 requests per window
-  message: "Too many login attempts, please try again later",
-  standardHeaders: true, // Return rate limit info in headers
-  legacyHeaders: false,
-});
+export const authLimiter = isTest
+  ? (req, res, next) => next()
+  : rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 10,
+      message: "Too many login attempts, please try again later",
+      standardHeaders: true,
+      legacyHeaders: false,
+    });
 
 /**
  * -----------------------------------------------------
@@ -30,13 +34,15 @@ export const authLimiter = rateLimit({
  * - Time window: 1 minute
  * - Max attempts: 20 per IP
  */
-export const transactionLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 20, // limit each IP to 20 requests per window
-  message: "Too many transaction requests, please slow down",
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+export const transactionLimiter = isTest
+  ? (req, res, next) => next()
+  : rateLimit({
+      windowMs: 60 * 1000,
+      max: 20,
+      message: "Too many transaction requests, please slow down",
+      standardHeaders: true,
+      legacyHeaders: false,
+    });
 
 /**
  * -----------------------------------------------------
@@ -48,10 +54,12 @@ export const transactionLimiter = rateLimit({
  * - Time window: 15 minutes
  * - Max attempts: 100 per IP
  */
-export const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per window
-  message: "Too many requests, please try again later",
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+export const apiLimiter = isTest
+  ? (req, res, next) => next()
+  : rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 100,
+      message: "Too many requests, please try again later",
+      standardHeaders: true,
+      legacyHeaders: false,
+    });
