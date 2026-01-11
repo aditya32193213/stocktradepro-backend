@@ -49,8 +49,4 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// 🔹 Explicit indexes for auth performance
-userSchema.index({ email: 1 });
-userSchema.index({ pan: 1 });
-
 export default mongoose.model("User", userSchema);
