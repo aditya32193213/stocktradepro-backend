@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { logger } from "../utils/index.js";
 
 /**
  * -----------------------------------------------------
@@ -15,13 +16,21 @@ import mongoose from "mongoose";
 const connectDB = async () => {
   try {
     // Attempt to connect to MongoDB
-    const conn = await mongoose.connect(process.env.MONGO_URI);
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+      maxPoolSize: 10,
+      minPoolSize: 2,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
 
     // Log successful connection host
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+    logger.info(`✅ MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     // Log error and terminate process on failure
-    console.error(`❌ MongoDB Connection Error: ${error.message}`);
+    logger.error("❌ MongoDB Connection Error",{
+      message: error.message,
+      stack: error.stack,
+    });
     process.exit(1);
   }
 };

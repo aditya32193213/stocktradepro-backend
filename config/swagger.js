@@ -27,14 +27,14 @@ const swaggerDefinition = {
    * - Render automatically replaces this in production
    */
   servers: [
-    {
-      url: "http://localhost:10000",
-      description: "Local Development server"
-    },
-    {
-        url: "https://stocktradepro-backend.onrender.com/",
-        description: "Production Server",
-    }
+   {
+    url: process.env.NODE_ENV === 'production' 
+      ? `${process.env.BASE_URL}/api/v1`
+      : "http://localhost:10000/api/v1",
+    description: process.env.NODE_ENV === 'production' 
+      ? "Production Server"
+      : "Development Server"
+  }
   ],
 
   /**
@@ -49,17 +49,7 @@ const swaggerDefinition = {
         bearerFormat: "JWT"
       }
     }
-  },
-
-  /**
-   * Apply JWT security globally
-   * (Individual routes can override if needed)
-   */
-  security: [
-    {
-      bearerAuth: []
-    }
-  ]
+  }
 };
 
 /**
@@ -68,7 +58,7 @@ const swaggerDefinition = {
  */
 const options = {
   swaggerDefinition,
-  apis: ["./routes/*.js"]
+  apis: ["./routes/**/*.js"]
 };
 
 // Generate Swagger specification

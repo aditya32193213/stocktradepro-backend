@@ -17,7 +17,8 @@ export {
   buyStock,
   sellStock,
   getTransactions,
-  exportTransactionsPDF
+  exportTransactionsPDF,
+  exportTransactionsCSV
 } from "./transaction.controller.js";
 
 // Watchlist Controllers
@@ -26,3 +27,9 @@ export {
   getWatchlist,
   removeFromWatchlist
 } from "./watchlist.controller.js";
+
+// Dashboard Controllers
+export { getDashboardSummary } from "./dashboard.controller.js";
+
+//Portfolio Controllers
+export { getPortfolio } from "./portfolio.controller.js";

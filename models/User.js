@@ -37,7 +37,8 @@ const userSchema = new mongoose.Schema(
 
     password: {
       type: String,
-      required: true
+      required: true,
+      select: false
     },
 
     balance: {
@@ -48,8 +49,8 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-/**
- * Indexes for authentication & uniqueness
- */
+// 🔹 Explicit indexes for auth performance
+userSchema.index({ email: 1 });
+userSchema.index({ pan: 1 });
 
 export default mongoose.model("User", userSchema);

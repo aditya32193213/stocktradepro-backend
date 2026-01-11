@@ -1,47 +1,62 @@
 import bcrypt from "bcryptjs";
 import { User } from "../models/index.js";
-import { generateToken } from "../utils/index.js";
+import { generateToken, AppError } from "../utils/index.js";
 
 /**
  * -----------------------------------------------------
  * Auth Service
  * -----------------------------------------------------
- * Handles user registration and login business logic.
+ *  Single DB call for uniqueness checks
+ *  Clear error messages
+ *  AppError consistency
  */
 
 export const registerUserService = async (payload) => {
   const { name, email, mobile, pan, password } = payload;
 
-  // Check if user already exists
-  const userExists = await User.findOne({ $or: [{ email }, { pan }] });
-  if (userExists) {
-    throw new Error("User already exists");
+  // 🔹 Single DB call to check uniqueness
+  const existingUser = await User.findOne({
+    $or: [{ email }, { pan }],
+  }).lean();
+
+  if (existingUser) {
+    if (existingUser.email === email) {
+      throw new AppError("Email already registered", 409);
+    }
+    if (existingUser.pan === pan) {
+      throw new AppError("PAN already registered", 409);
+    }
   }
 
-  // Hash password
+  // 🔹 Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // Create user
-  await User.create({
+  // 🔹 Create user
+  const user = await User.create({
     name,
     email,
     mobile,
     pan,
-    password: hashedPassword
+    password: hashedPassword,
   });
 
-  return true;
+  return {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+  };
 };
 
 export const loginUserService = async (email, password) => {
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select("+password");
+
   if (!user) {
-    throw new Error("Invalid credentials");
+    throw new AppError("Invalid email or password", 401);
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    throw new Error("Invalid credentials");
+    throw new AppError("Invalid email or password", 401);
   }
 
   return {
@@ -50,7 +65,7 @@ export const loginUserService = async (email, password) => {
       id: user._id,
       name: user.name,
       email: user.email,
-      balance: user.balance
-    }
+      balance: user.balance,
+    },
   };
 };

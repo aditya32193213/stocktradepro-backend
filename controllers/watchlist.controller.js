@@ -25,7 +25,7 @@ export const addToWatchlist = async (req, res, next) => {
  */
 export const getWatchlist = async (req, res, next) => {
   try {
-    const watchlist = await getWatchlistService(req.user._id);
+    const watchlist = await getWatchlistService(req.user._id, req.query);
     res.json(watchlist);
   } catch (error) {
     next(error);
@@ -40,7 +40,7 @@ export const getWatchlist = async (req, res, next) => {
 export const removeFromWatchlist = async (req, res, next) => {
   try {
     await removeFromWatchlistService(req.user._id, req.params.id);
-    res.json({ message: "Stock removed from watchlist" });
+    res.status(200).json({ message: "Stock removed from watchlist" });
   } catch (error) {
     next(error);
   }

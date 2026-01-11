@@ -1,7 +1,8 @@
 import express from "express";
-import { registerUser, loginUser } from "../controllers/index.js";
-import { registerValidation, loginValidation } from "../validations/index.js";
-import { authLimiter } from "../middleware/index.js";
+import { registerUser, loginUser } from "../../controllers/index.js";
+import { registerValidation, loginValidation } from "../../validations/index.js";
+import { authLimiter } from "../../middleware/index.js";
+import { validate } from "../../middleware/index.js";
 
 const router = express.Router();
 
@@ -14,7 +15,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/auth/register:
+ * /auth/register:
  *   post:
  *     summary: Register a new user
  *     tags: [Auth]
@@ -54,14 +55,15 @@ const router = express.Router();
  *       409:
  *         description: User already exists
  */
-router.post("/register", registerValidation, registerUser);
+router.post("/register", registerValidation, validate, registerUser);
 
 /**
  * @swagger
- * /api/auth/login:
+ * /auth/login:
  *   post:
  *     summary: Login user and receive JWT token
  *     tags: [Auth]
+ *     security:  []
  *     requestBody:
  *       required: true
  *       content:
@@ -82,6 +84,6 @@ router.post("/register", registerValidation, registerUser);
  *       401:
  *         description: Invalid credentials
  */
-router.post("/login", authLimiter, loginValidation, loginUser);
+router.post("/login", authLimiter, loginValidation, validate, loginUser);
 
 export default router;

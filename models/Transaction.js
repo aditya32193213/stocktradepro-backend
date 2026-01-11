@@ -14,14 +14,12 @@ const transactionSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
-      index: true // Fast user transaction lookup
     },
 
     stock: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Stock",
       required: true,
-      index: true
     },
 
     type: {
@@ -53,9 +51,7 @@ const transactionSchema = new mongoose.Schema(
  */
 
 // Fetch user transactions sorted by time
-transactionSchema.index({ user: 1, createdAt: -1 });
-
-// Optimize stock-based transaction queries
-transactionSchema.index({ stock: 1, createdAt: -1 });
+transactionSchema.index({ user: 1, createdAt: -1 }); // For date filtering
+transactionSchema.index({ user: 1, type: 1 }); // For type filtering
 
 export default mongoose.model("Transaction", transactionSchema);

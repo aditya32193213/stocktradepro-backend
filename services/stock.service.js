@@ -1,4 +1,5 @@
 import { Stock } from "../models/index.js";
+import { AppError } from "../utils/index.js";
 
 /**
  * -----------------------------------------------------
@@ -17,16 +18,26 @@ export const getStocksService = async (queryParams) => {
     order = "asc"
   } = queryParams;
 
-  const skip = (page - 1) * limit;
+  // Add sanitization
+  const sanitizedPage = Math.max(1, parseInt(page) || 1);
+  const sanitizedLimit = Math.min(100, Math.max(1, parseInt(limit) || 10));
+  
+  // Whitelist sortBy to prevent injection
+  const allowedSortFields = ["symbol", "companyName", "marketCap", "price", "changePercent"];
+  const sanitizedSortBy = allowedSortFields.includes(sortBy) ? sortBy : "symbol";
+  
   const sortOrder = order === "desc" ? -1 : 1;
+  const skip = (sanitizedPage - 1) * sanitizedLimit;
 
   const query = {};
 
+  // ✅ FIXED: Use regex for better UX (partial matching)
+  // Text search is faster but requires exact word matches
   if (search) {
-    query.$or = [
-      { companyName: { $regex: search, $options: "i" } },
-      { symbol: { $regex: search, $options: "i" } }
-    ];
+  query.$or = [
+    { companyName: { $regex: search, $options: "i" } },
+    { symbol: { $regex: search, $options: "i" } }
+  ];
   }
 
   if (sector) {
@@ -36,16 +47,16 @@ export const getStocksService = async (queryParams) => {
   const [totalRecords, stocks] = await Promise.all([
     Stock.countDocuments(query),
     Stock.find(query)
-      .sort({ [sortBy]: sortOrder })
+      .sort({ [sanitizedSortBy]: sortOrder })
       .skip(skip)
-      .limit(Number(limit))
+      .limit(sanitizedLimit)
       .lean()
   ]);
 
   return {
-    page: Number(page),
-    pageSize: Number(limit),
-    totalPages: Math.ceil(totalRecords / limit),
+    page: sanitizedPage,
+    pageSize: sanitizedLimit,
+    totalPages: Math.ceil(totalRecords / sanitizedLimit),
     totalRecords,
     data: stocks
   };
@@ -54,7 +65,7 @@ export const getStocksService = async (queryParams) => {
 export const getStockByIdService = async (id) => {
   const stock = await Stock.findById(id).lean();
   if (!stock) {
-    throw new Error("Stock not found");
+    throw new AppError("Stock not found", 404);
   }
   return stock;
 };

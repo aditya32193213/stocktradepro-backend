@@ -3,7 +3,7 @@
  * Stock Schema
  * -----------------------------------------------------
  * Represents a tradable stock in the system.
- * Optimized for listing, filtering, and sorting.
+ * Optimized for listing, filtering, sorting, and search.
  */
 
 import mongoose from "mongoose";
@@ -15,24 +15,23 @@ const stockSchema = new mongoose.Schema(
       required: true,
       unique: true,
       uppercase: true,
-      index: true // Fast lookup by stock symbol
+      index: true
     },
 
     companyName: {
       type: String,
-      required: true,
-      index: true // Enables text-based search
+      required: true
     },
 
     sector: {
       type: String,
       required: true,
-      index: true // Enables sector filtering
+      index: true
     },
 
     logoUrl: {
       type: String,
-      required: true // CDN-based logo (fallback handled in frontend)
+      required: true
     },
 
     price: {
@@ -62,13 +61,12 @@ const stockSchema = new mongoose.Schema(
 );
 
 /**
- * Compound indexes for performance
+ * -----------------------------------------------------
+ * Indexes
+ * -----------------------------------------------------
  */
 
-// Sorting stocks by market cap (used in listings)
-stockSchema.index({ marketCap: -1 });
-
-// Combined sector + marketCap filter/sort
+// Compound index for sector-based ranking
 stockSchema.index({ sector: 1, marketCap: -1 });
 
 export default mongoose.model("Stock", stockSchema);

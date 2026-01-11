@@ -11,7 +11,7 @@ import {
 export const getAllStocks = async (req, res, next) => {
   try {
     const result = await getStocksService(req.query);
-    res.json(result);
+    res.status(200).json(result);
   } catch (error) {
     next(error);
   }
@@ -25,7 +25,7 @@ export const getAllStocks = async (req, res, next) => {
 export const getStockById = async (req, res, next) => {
   try {
     const stock = await getStockByIdService(req.params.id);
-    res.json(stock);
+    res.status(200).json(stock);
   } catch (error) {
     next(error);
   }

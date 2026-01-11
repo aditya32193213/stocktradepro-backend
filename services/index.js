@@ -3,7 +3,10 @@
  */
 export {
   buyStockService,
-  sellStockService
+  sellStockService,
+  exportTransactionsCSVService,
+  exportTransactionsPDFService,
+  getTransactionsService  
 } from "./transaction.service.js";
 
 export {
@@ -21,3 +24,7 @@ export {
   getWatchlistService,
   removeFromWatchlistService
 } from "./watchlist.service.js";
+
+export { getDashboardSummaryService } from "./dashboard.service.js";
+
+export { getPortfolioService } from "./portfolio.service.js";

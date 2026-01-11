@@ -1,6 +1,7 @@
 import express from "express";
-import { getAllStocks, getStockById } from "../controllers/index.js";
-
+import { getAllStocks, getStockById } from "../../controllers/index.js";
+import { validate } from "../../middleware/index.js";   
+import { getStocksValidation, getStockByIdValidation } from "../../validations/index.js";
 const router = express.Router();
 
 /**
@@ -12,10 +13,11 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/stocks:
+ * /stocks:
  *   get:
  *     summary: Get all stocks
  *     tags: [Stocks]
+ *     security:  []
  *     parameters:
  *       - in: query
  *         name: search
@@ -51,14 +53,15 @@ const router = express.Router();
  *       200:
  *         description: Paginated list of stocks
  */
-router.get("/", getAllStocks);
+router.get("/", getStocksValidation, validate, getAllStocks);
 
 /**
  * @swagger
- * /api/stocks/{id}:
+ * /stocks/{id}:
  *   get:
  *     summary: Get stock by ID
  *     tags: [Stocks]
+ *     security:  []
  *     parameters:
  *       - in: path
  *         name: id
@@ -71,6 +74,6 @@ router.get("/", getAllStocks);
  *       404:
  *         description: Stock not found
  */
-router.get("/:id", getStockById);
+router.get("/:id", getStockByIdValidation, validate, getStockById);
 
 export default router;

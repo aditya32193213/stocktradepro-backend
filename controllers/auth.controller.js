@@ -1,4 +1,3 @@
-import { validationResult } from "express-validator";
 import {
   registerUserService,
   loginUserService
@@ -11,13 +10,7 @@ import {
  */
 export const registerUser = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     await registerUserService(req.body);
-
     res.status(201).json({ message: "Registration successful" });
   } catch (error) {
     next(error);
@@ -31,17 +24,12 @@ export const registerUser = async (req, res, next) => {
  */
 export const loginUser = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const response = await loginUserService(
       req.body.email,
       req.body.password
     );
 
-    res.json(response);
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }
