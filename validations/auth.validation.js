@@ -15,12 +15,19 @@ export const registerValidation = [
     .isLength({ min: 2, max: 100 })
     .withMessage("Name must be between 2 and 100 characters"),
 
-  body("email")
+    body("email")
     .trim()
+    .notEmpty()
+    .withMessage("Email is required")
     .isEmail()
     .withMessage("Valid email required")
-    .toLowerCase(),
-    //.normalizeEmail(),
+    .normalizeEmail({ gmail_remove_dots: false }),
+
+  // body("email")
+  //   .trim()
+  //   .isEmail()
+  //   .withMessage("Valid email required")
+  //   .normalizeEmail(),
 
   body("mobile")
     .trim()
