@@ -1,12 +1,12 @@
 /**
  * -----------------------------------------------------
- * Winston Logger (Render & Production Ready)
+ * Winston Logger Configuration
  * -----------------------------------------------------
  *
  * Logging strategy:
  * - Console logs only (stdout/stderr)
  * - Structured JSON in production
- * - Colorized, readable logs in development
+ * - Clean, readable logs in development
  *
  * Why no file logging?
  * - Render uses ephemeral filesystem
@@ -28,14 +28,13 @@ const logger = winston.createLogger({
     : winston.format.combine(
         winston.format.colorize(),
         winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-        winston.format.printf(
-          ({ timestamp, level, message, ...meta }) =>
-            `${timestamp} [${level}]: ${message}${
-              Object.keys(meta).length
-                ? ` ${JSON.stringify(meta, null, 2)}`
-                : ""
-            }`
-        )
+        winston.format.printf(({ timestamp, level, message }) => {
+          return `${timestamp} [${level}]: ${
+            typeof message === "object"
+              ? JSON.stringify(message)
+              : message
+          }`;
+        })
       ),
   transports: [
     // Render & local-friendly console logging

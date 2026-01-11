@@ -11,7 +11,7 @@ import { transactionLimiter } from "../../middleware/rateLimit.middleware.js";
 import {
   buyStockValidation,
   sellStockValidation,
-  getTransactionsValidation, // ✅ ADDED
+  getTransactionsValidation,
 } from "../../validations/index.js";
 import { validate } from "../../middleware/index.js";
 
@@ -125,7 +125,7 @@ router.post("/sell", transactionLimiter, sellStockValidation, validate, sellStoc
  *       200:
  *         description: List of transactions
  */
-// ✅ FIXED: Added validation
+
 router.get("/", getTransactionsValidation, validate, getTransactions);
 
 /**
@@ -160,7 +160,7 @@ router.get("/", getTransactionsValidation, validate, getTransactions);
  *       200:
  *         description: PDF file
  */
-// ✅ FIXED: Added validation for export endpoints too
+
 router.get("/export/pdf", getTransactionsValidation, validate, exportTransactionsPDF);
 
 /**
@@ -195,7 +195,7 @@ router.get("/export/pdf", getTransactionsValidation, validate, exportTransaction
  *       200:
  *         description: CSV file
  */
-// ✅ FIXED: Added validation
+
 router.get("/export/csv", getTransactionsValidation, validate, exportTransactionsCSV);
 
 export default router;

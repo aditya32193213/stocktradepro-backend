@@ -11,7 +11,6 @@ import { requestLogger } from "./middleware/index.js";
 
 const app = express();
 
-
 app.use(requestId);
 /**
  * -----------------------------------------------------
@@ -52,16 +51,12 @@ app.use(requestLogger);
 
 app.use(cors());
 
-// Parse JSON payloads and URL-encoded data
-// ✅ Use constants
 const PAYLOAD_LIMIT = process.env.PAYLOAD_LIMIT || "1mb";
 app.use(express.json({ limit: PAYLOAD_LIMIT }));
 app.use(express.urlencoded({ extended: true, limit: PAYLOAD_LIMIT }));
 
 
-
 app.use(mongoSanitizeMiddleware);
-
 
 /**
  * -----------------------------------------------------

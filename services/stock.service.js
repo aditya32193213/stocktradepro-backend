@@ -31,8 +31,6 @@ export const getStocksService = async (queryParams) => {
 
   const query = {};
 
-  // ✅ FIXED: Use regex for better UX (partial matching)
-  // Text search is faster but requires exact word matches
   if (search) {
   query.$or = [
     { companyName: { $regex: search, $options: "i" } },

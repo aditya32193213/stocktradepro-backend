@@ -43,7 +43,7 @@ const userSchema = new mongoose.Schema(
 
     balance: {
       type: Number,
-      default: 100000 // Demo trading balance
+      default: 100000
     }
   },
   { timestamps: true }

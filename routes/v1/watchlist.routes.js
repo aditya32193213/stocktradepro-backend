@@ -4,10 +4,10 @@ import {
   getWatchlist,
   removeFromWatchlist
 } from "../../controllers/index.js";
-import { protect, validate } from "../../middleware/index.js"; // ✅ ADDED validate
+import { protect, validate } from "../../middleware/index.js";
 import { 
   addToWatchlistValidation,
-  getWatchlistValidation,  // ✅ ADDED
+  getWatchlistValidation, 
   removeFromWatchlistValidation 
 } from "../../validations/index.js";
 
@@ -51,7 +51,7 @@ router.use(protect);
  *       409:
  *         description: Stock already in watchlist
  */
-// ✅ FIXED: Added validation
+
 router.post("/", addToWatchlistValidation, validate, addToWatchlist);
 
 /**
@@ -82,7 +82,7 @@ router.post("/", addToWatchlistValidation, validate, addToWatchlist);
  *       200:
  *         description: Watchlist fetched
  */
-// ✅ FIXED: Added validation for query parameters
+
 router.get("/", getWatchlistValidation, validate, getWatchlist);
 
 /**
@@ -109,7 +109,7 @@ router.get("/", getWatchlistValidation, validate, getWatchlist);
  *       404:
  *         description: Watchlist item not found
  */
-// ✅ FIXED: Added validation
+
 router.delete("/:id", removeFromWatchlistValidation, validate, removeFromWatchlist);
 
 export default router;

@@ -8,7 +8,7 @@ import { AppError } from "../utils/index.js";
  */
 export const getDashboardSummaryService = async (user) => {
 
-      // ✅ Add validation
+      
   if (!user || !user._id) {
     throw new AppError('Invalid user', 400);
   }

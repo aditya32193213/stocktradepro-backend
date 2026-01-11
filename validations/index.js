@@ -16,7 +16,7 @@ export {
 export {
   buyStockValidation,
   sellStockValidation,
-  getTransactionsValidation  // ✅ Now from transaction.validation.js
+  getTransactionsValidation  
 } from "./transaction.validation.js";
 
 // Stock Validations
@@ -28,6 +28,6 @@ export {
 // Watchlist Validations
 export {
   addToWatchlistValidation,
-  getWatchlistValidation,      // ✅ Now from watchlist.validation.js
-  removeFromWatchlistValidation // ✅ Now from watchlist.validation.js
+  getWatchlistValidation,      
+  removeFromWatchlistValidation 
 } from "./watchlist.validation.js";

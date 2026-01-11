@@ -21,22 +21,16 @@ export const registerValidation = [
     .withMessage("Email is required")
     .isEmail()
     .withMessage("Valid email required")
-    .normalizeEmail({ gmail_remove_dots: false }),
+    .toLowerCase(),
 
-  // body("email")
-  //   .trim()
-  //   .isEmail()
-  //   .withMessage("Valid email required")
-  //   .normalizeEmail(),
-
-  body("mobile")
+    body("mobile")
     .trim()
     .isLength({ min: 10, max: 10 })
     .withMessage("Mobile number must be 10 digits")
     .isNumeric()
     .withMessage("Mobile number must contain only digits"),
 
-  body("pan")
+    body("pan")
     .trim()
     .toUpperCase()
     .matches(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/)
@@ -45,7 +39,6 @@ export const registerValidation = [
   body("password")
     .isLength({ min: 8 })
     .withMessage("Password must be at least 8 characters")
-    // ✅ FIXED: Removed character restriction at the end
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()_+\-=\[\]{};':"\\|,.<>\/~`])/)
     .withMessage(
       "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"

@@ -43,10 +43,10 @@ let server;
  */
 const startServer = async () => {
   try {
-    // 1️⃣ Connect to MongoDB first
+    //  Connect to MongoDB first
     await connectDB();
 
-    // 2️⃣ Start HTTP server
+    //  Start HTTP server
     server = app.listen(PORT, () => {
       logger.info("🚀 Server started successfully");
       logger.info(`🌐 Base URL: ${BASE_URL}`);
@@ -79,7 +79,7 @@ const gracefulShutdown = async (signal) => {
   }, 10000);
 
   try {
-    // 1️⃣ Stop accepting new HTTP connections
+    //  Stop accepting new HTTP connections
     if (server) {
       await new Promise((resolve) => {
         server.close(() => {
@@ -89,7 +89,7 @@ const gracefulShutdown = async (signal) => {
       });
     }
 
-    // 2️⃣ Close MongoDB connection
+    // Close MongoDB connection
     if (mongoose.connection.readyState === 1) {
       await mongoose.connection.close(false);
       logger.info("✅ MongoDB connection closed");

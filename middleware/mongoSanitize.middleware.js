@@ -2,85 +2,72 @@
  * -----------------------------------------------------
  * MongoDB Injection Sanitization Middleware
  * -----------------------------------------------------
- *
- * Purpose:
- * - Prevent MongoDB operator injection attacks
- *   (e.g. $gt, $ne, $where, or dot-notation exploitation)
- * - Safely sanitize incoming request data
- *
- * Why custom middleware?
- * - express-mongo-sanitize mutates req.query internally
- * - Newer Node.js (v22+) & Express make req.query read-only
- * - This implementation avoids mutating req.query entirely
- *   and remains fully compatible with modern runtimes
  */
 
 /**
- * Sanitizes a single value.
- * Removes MongoDB special characters:
- * - '$' (used for operators like $gt, $ne)
- * - '.' (used for nested path injection)
- *
- * @param {any} value - Value to sanitize
- * @returns {any} - Sanitized value
+ * Sanitizes object KEYS only (not values)
+ * Removes MongoDB operators from keys to prevent injection
  */
-const sanitize = (value) => {
+const sanitizeKeys = (obj) => {
+  if (!obj || typeof obj !== "object") return obj;
+
+  const sanitized = {};
+  
+  for (const key in obj) {
+    // Remove $ and . from KEYS only
+    const sanitizedKey = key.replace(/^\$+/, '').replace(/\./g, '_');
+    
+    // Recursively sanitize nested objects
+    if (typeof obj[key] === "object" && obj[key] !== null) {
+      sanitized[sanitizedKey] = sanitizeKeys(obj[key]);
+    } else {
+      // Keep values unchanged (important for emails, etc.)
+      sanitized[sanitizedKey] = obj[key];
+    }
+  }
+  
+  return sanitized;
+};
+
+/**
+ * Sanitizes a single value to prevent operator injection
+ * Only removes $ from the START of strings
+ */
+const sanitizeValue = (value) => {
   if (typeof value === "string") {
-    return value.replace(/\$|\./g, "");
+    // Only remove $ from beginning (operators like $ne, $gt)
+    // Don't touch dots (needed for emails, decimals, etc.)
+    return value.replace(/^\$/g, "");
   }
   return value;
 };
 
 /**
- * Recursively sanitizes all properties of an object.
- * Handles deeply nested objects safely.
- *
- * @param {Object} obj - Object to sanitize
- */
-const sanitizeObject = (obj) => {
-  if (!obj || typeof obj !== "object") return;
-
-  for (const key in obj) {
-    obj[key] = sanitize(obj[key]);
-
-    if (typeof obj[key] === "object") {
-      sanitizeObject(obj[key]);
-    }
-  }
-};
-
-/**
- * Express Middleware:
- * Sanitizes incoming request data before it reaches controllers.
- *
- * ✔ Sanitizes:
- *   - req.body   (POST / PUT / PATCH payloads)
- *   - req.params (URL parameters)
- *
- * ❌ Does NOT sanitize:
- *   - req.query (read-only in modern Express / Node)
- *
- * This design prevents runtime errors and keeps the app secure.
+ * Express Middleware
  */
 const mongoSanitizeMiddleware = (req, res, next) => {
-  // Safe to mutate
-  sanitizeObject(req.body);
-  sanitizeObject(req.params);
+  // Sanitize body values (but not too aggressively)
+  if (req.body && typeof req.body === "object") {
+    for (const key in req.body) {
+      req.body[key] = sanitizeValue(req.body[key]);
+    }
+  }
 
-  // ❌ DO NOT TOUCH req.query
-  // ✅ Create a new sanitized copy
+  // Sanitize params values
+  if (req.params && typeof req.params === "object") {
+    for (const key in req.params) {
+      req.params[key] = sanitizeValue(req.params[key]);
+    }
+  }
+
+  // Create sanitized query (don't mutate original)
   if (req.query && Object.keys(req.query).length > 0) {
     const sanitizedQuery = {};
-
+    
     for (const key in req.query) {
-      sanitizedQuery[key] = sanitize(req.query[key]);
-
-      if (typeof req.query[key] === "object") {
-        sanitizeObject(sanitizedQuery[key]);
-      }
+      sanitizedQuery[key] = sanitizeValue(req.query[key]);
     }
-
-    // Attach safely
+    
     req.sanitizedQuery = sanitizedQuery;
   }
 

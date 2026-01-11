@@ -1,7 +1,3 @@
-
-
-
-
 import { body, query } from "express-validator";
 
 /**
