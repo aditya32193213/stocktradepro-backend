@@ -5,19 +5,10 @@ import PDFDocument from "pdfkit";
 
 /**
  * -----------------------------------------------------
- * Transaction Service 
- * -----------------------------------------------------
- *  Uses MongoDB transactions for atomicity
- *  Proper error handling with AppError
- *  Input validation
- *  Race condition prevention
- */
-
-/**
  * Buy Stock 
+ * -----------------------------------------------------
  */
-export const buyStockService = async (userId, stockId, quantity) => {
-  // Input validation
+export const buyStockService = async (userId, stockId, quantity, notes = "") => {
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     throw new AppError("Invalid user ID", 400);
   }
@@ -34,13 +25,11 @@ export const buyStockService = async (userId, stockId, quantity) => {
   session.startTransaction();
 
   try {
-    // Fetch user with session lock
     const user = await User.findById(userId).session(session);
     if (!user) {
       throw new AppError("User not found", 404);
     }
 
-    // Fetch stock
     const stock = await Stock.findById(stockId).session(session);
     if (!stock) {
       throw new AppError("Stock not found", 404);
@@ -48,7 +37,6 @@ export const buyStockService = async (userId, stockId, quantity) => {
 
     const totalAmount = stock.price * quantity;
 
-    // Check balance
     if (user.balance < totalAmount) {
       throw new AppError(
         `Insufficient balance. Required: ₹${totalAmount.toFixed(2)}, Available: ₹${user.balance.toFixed(2)}`,
@@ -56,14 +44,12 @@ export const buyStockService = async (userId, stockId, quantity) => {
       );
     }
 
-    // Update user balance (atomic operation)
     await User.findByIdAndUpdate(
       userId,
       { $inc: { balance: -totalAmount } },
       { session, new: true }
     );
 
-    // Create transaction
     const [transaction] = await Transaction.create(
       [
         {
@@ -73,17 +59,17 @@ export const buyStockService = async (userId, stockId, quantity) => {
           quantity,
           price: stock.price,
           totalAmount,
+          notes: notes || ""
         },
       ],
       { session }
     );
 
-    // Commit transaction
     await session.commitTransaction();
+    await transaction.populate('stock', 'symbol companyName logoUrl');
 
     return transaction;
   } catch (error) {
-    // Rollback on any error
     await session.abortTransaction();
     throw error;
   } finally {
@@ -92,10 +78,11 @@ export const buyStockService = async (userId, stockId, quantity) => {
 };
 
 /**
- * Sell Stock 
+ * -----------------------------------------------------
+ * Sell Stock (Enhanced with Notes)
+ * -----------------------------------------------------
  */
-export const sellStockService = async (userId, stockId, quantity) => {
-  // Input validation
+export const sellStockService = async (userId, stockId, quantity, notes = "") => {
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     throw new AppError("Invalid user ID", 400);
   }
@@ -122,7 +109,6 @@ export const sellStockService = async (userId, stockId, quantity) => {
       throw new AppError("Stock not found", 404);
     }
 
-    // Calculate owned quantity using aggregation (more efficient)
     const result = await Transaction.aggregate([
       {
         $match: {
@@ -157,14 +143,12 @@ export const sellStockService = async (userId, stockId, quantity) => {
 
     const totalAmount = stock.price * quantity;
 
-    // Update user balance
     await User.findByIdAndUpdate(
       userId,
       { $inc: { balance: totalAmount } },
       { session, new: true }
     );
 
-    // Create SELL transaction
     const [transaction] = await Transaction.create(
       [
         {
@@ -174,12 +158,14 @@ export const sellStockService = async (userId, stockId, quantity) => {
           quantity,
           price: stock.price,
           totalAmount,
+          notes: notes || ""
         },
       ],
       { session }
     );
 
     await session.commitTransaction();
+    await transaction.populate('stock', 'symbol companyName logoUrl');
 
     return transaction;
   } catch (error) {
@@ -231,7 +217,7 @@ export const getTransactionsService = async (userId, filters = {}) => {
 };
 
 /**
- * Export Transactions as PDF (UNCHANGED - Already good)
+ * Export Transactions as PDF
  */
 export const exportTransactionsPDFService = async (userId, filters = {}) => {
   const { type, stockId, fromDate, toDate } = filters;
@@ -256,7 +242,7 @@ export const exportTransactionsPDFService = async (userId, filters = {}) => {
 
   doc
     .fontSize(18)
-    .text("StockTradePro – Transaction History", { align: "center" })
+    .text("StockTradePro - Transaction History", { align: "center" })
     .moveDown(2);
 
   doc.fontSize(12);
@@ -287,7 +273,7 @@ export const exportTransactionsPDFService = async (userId, filters = {}) => {
 };
 
 /**
- * Export Transactions as CSV (UNCHANGED - Already good)
+ * Export Transactions as CSV
  */
 export const exportTransactionsCSVService = async (userId, filters = {}) => {
   const { type, stockId, fromDate, toDate } = filters;
@@ -308,7 +294,7 @@ export const exportTransactionsCSVService = async (userId, filters = {}) => {
     .sort({ createdAt: -1 })
     .lean();
 
-  let csv = "Date,Stock,Type,Quantity,Price,TotalAmount\n";
+  let csv = "Date,Stock,Type,Quantity,Price,TotalAmount,Notes\n";
 
   transactions.forEach((tx) => {
     csv += `${new Date(tx.createdAt).toISOString()},`;
@@ -316,7 +302,8 @@ export const exportTransactionsCSVService = async (userId, filters = {}) => {
     csv += `${tx.type},`;
     csv += `${tx.quantity},`;
     csv += `${tx.price},`;
-    csv += `${tx.totalAmount}\n`;
+    csv += `${tx.totalAmount},`;
+    csv += `"${tx.notes || ''}"\n`;
   });
 
   return csv;

@@ -4,17 +4,13 @@ import { generateToken, AppError } from "../utils/index.js";
 
 /**
  * -----------------------------------------------------
- * Auth Service
+ * Register User Service
  * -----------------------------------------------------
- *  Single DB call for uniqueness checks
- *  Clear error messages
- *  AppError consistency
  */
-
 export const registerUserService = async (payload) => {
   const { name, email, mobile, pan, password } = payload;
 
-  // 🔹 Single DB call to check uniqueness
+  // Single DB call to check uniqueness
   const existingUser = await User.findOne({
     $or: [{ email }, { pan }],
   }).lean();
@@ -28,10 +24,10 @@ export const registerUserService = async (payload) => {
     }
   }
 
-  // 🔹 Hash password
+  // Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // 🔹 Create user
+  // Create user
   const user = await User.create({
     name,
     email,
@@ -47,6 +43,11 @@ export const registerUserService = async (payload) => {
   };
 };
 
+/**
+ * -----------------------------------------------------
+ * Login User Service
+ * -----------------------------------------------------
+ */
 export const loginUserService = async (email, password) => {
   const user = await User.findOne({ email }).select("+password");
 
@@ -65,7 +66,64 @@ export const loginUserService = async (email, password) => {
       id: user._id,
       name: user.name,
       email: user.email,
+      mobile: user.mobile,
       balance: user.balance,
     },
+  };
+};
+
+/**
+ * -----------------------------------------------------
+ * Get User Profile Service
+ * -----------------------------------------------------
+ */
+export const getUserProfileService = async (userId) => {
+  const user = await User.findById(userId).lean();
+
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  return {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    mobile: user.mobile,
+    pan: user.pan,
+    balance: user.balance,
+    createdAt: user.createdAt,
+  };
+};
+
+/**
+ * -----------------------------------------------------
+ * Update User Profile Service
+ * -----------------------------------------------------
+ */
+export const updateUserProfileService = async (userId, updates) => {
+  const { name, mobile } = updates;
+
+  // Only allow updating name and mobile
+  const allowedUpdates = {};
+  if (name) allowedUpdates.name = name;
+  if (mobile) allowedUpdates.mobile = mobile;
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    allowedUpdates,
+    { new: true, runValidators: true }
+  ).select("-password");
+
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  return {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    mobile: user.mobile,
+    pan: user.pan,
+    balance: user.balance,
   };
 };

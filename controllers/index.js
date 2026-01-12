@@ -7,7 +7,12 @@
  */
 
 // Auth Controllers
-export { registerUser, loginUser } from "./auth.controller.js";
+export { 
+  registerUser, 
+  loginUser, 
+  getUserProfile, 
+  updateUserProfile 
+} from "./auth.controller.js";
 
 // Stock Controllers
 export { getAllStocks, getStockById } from "./stock.controller.js";

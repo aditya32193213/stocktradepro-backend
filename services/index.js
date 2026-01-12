@@ -16,7 +16,9 @@ export {
 
 export {
   registerUserService,
-  loginUserService
+  loginUserService,
+  getUserProfileService,
+  updateUserProfileService
 } from "./auth.service.js";
 
 export {

@@ -2,7 +2,7 @@ import { body, query } from "express-validator";
 
 /**
  * -----------------------------------------------------
- * Transaction Validation Rules
+ * Transaction Validation Rules 
  * -----------------------------------------------------
  */
 
@@ -20,7 +20,13 @@ export const buyStockValidation = [
     .notEmpty()
     .withMessage("Quantity is required")
     .isInt({ min: 1 })
-    .withMessage("Quantity must be at least 1")
+    .withMessage("Quantity must be at least 1"),
+  
+  body("notes")
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage("Notes must not exceed 500 characters")
 ];
 
 /**
@@ -37,7 +43,13 @@ export const sellStockValidation = [
     .notEmpty()
     .withMessage("Quantity is required")
     .isInt({ min: 1 })
-    .withMessage("Quantity must be at least 1")
+    .withMessage("Quantity must be at least 1"),
+  
+  body("notes")
+    .optional()
+    .trim()
+    .isLength({ max: 500 })
+    .withMessage("Notes must not exceed 500 characters")
 ];
 
 /**

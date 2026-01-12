@@ -1,9 +1,9 @@
 /**
  * -----------------------------------------------------
- * Transaction Schema
+ * Transaction Schema 
  * -----------------------------------------------------
  * Stores BUY / SELL operations for users.
- * Optimized for portfolio history and reporting.
+ * Enhanced with notes field for better record-keeping.
  */
 
 import mongoose from "mongoose";
@@ -41,6 +41,14 @@ const transactionSchema = new mongoose.Schema(
     totalAmount: {
       type: Number,
       required: true
+    },
+
+    // NEW: Optional notes for transactions
+    notes: {
+      type: String,
+      maxlength: 500,
+      trim: true,
+      default: ""
     }
   },
   { timestamps: true }
@@ -51,7 +59,8 @@ const transactionSchema = new mongoose.Schema(
  */
 
 // Fetch user transactions sorted by time
-transactionSchema.index({ user: 1, createdAt: -1 }); // For date filtering
-transactionSchema.index({ user: 1, type: 1 }); // For type filtering
+transactionSchema.index({ user: 1, createdAt: -1 });
+// For type filtering
+transactionSchema.index({ user: 1, type: 1 });
 
 export default mongoose.model("Transaction", transactionSchema);

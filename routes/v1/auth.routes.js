@@ -1,7 +1,12 @@
 import express from "express";
-import { registerUser, loginUser } from "../../controllers/index.js";
+import { 
+  registerUser, 
+  loginUser, 
+  getUserProfile, 
+  updateUserProfile 
+} from "../../controllers/index.js";
 import { registerValidation, loginValidation } from "../../validations/index.js";
-import { authLimiter } from "../../middleware/index.js";
+import { authLimiter, protect } from "../../middleware/index.js";
 import { validate } from "../../middleware/index.js";
 
 const router = express.Router();
@@ -86,14 +91,52 @@ router.post("/register", registerValidation, validate, registerUser);
  */
 router.post("/login", authLimiter, loginValidation, validate, loginUser);
 
+/**
+ * @swagger
+ * /auth/profile:
+ *   get:
+ *     summary: Get current user profile
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile retrieved successfully
+ *       401:
+ *         description: Unauthorized
+ */
+router.get("/profile", protect, getUserProfile);
+
+/**
+ * @swagger
+ * /auth/profile:
+ *   put:
+ *     summary: Update user profile
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: John Updated
+ *               mobile:
+ *                 type: string
+ *                 example: "9876543211"
+ *     responses:
+ *       200:
+ *         description: Profile updated successfully
+ *       401:
+ *         description: Unauthorized
+ */
+router.put("/profile", protect, updateUserProfile);
+
 export default router;
-
-
-
-
-
-
-
 
 
 

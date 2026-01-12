@@ -9,15 +9,18 @@ import { AppError } from "../utils/index.js";
 
 /**
  * -----------------------------------------------------
- * Buy Stock Controller
+ * Buy Stock Controller (Enhanced with Notes)
  * -----------------------------------------------------
  */
 export const buyStock = async (req, res, next) => {
   try {
+    const { stockId, quantity, notes } = req.body;
+    
     const transaction = await buyStockService(
       req.user._id,
-      req.body.stockId,
-      req.body.quantity
+      stockId,
+      quantity,
+      notes
     );
 
     res.status(201).json({
@@ -31,15 +34,18 @@ export const buyStock = async (req, res, next) => {
 
 /**
  * -----------------------------------------------------
- * Sell Stock Controller
+ * Sell Stock Controller (Enhanced with Notes)
  * -----------------------------------------------------
  */
 export const sellStock = async (req, res, next) => {
   try {
+    const { stockId, quantity, notes } = req.body;
+    
     const transaction = await sellStockService(
       req.user._id,
-      req.body.stockId,
-      req.body.quantity
+      stockId,
+      quantity,
+      notes
     );
 
     res.status(201).json({
@@ -65,7 +71,6 @@ export const getTransactions = async (req, res, next) => {
   }
 };
 
-
 /**
  * -----------------------------------------------------
  * Export Transactions PDF
@@ -82,7 +87,7 @@ export const exportTransactionsPDF = async (req, res, next) => {
     );
 
     pdfDoc.on('error', (err) => {
-  next(new AppError('PDF generation failed', 500));
+      next(new AppError('PDF generation failed', 500));
     });
 
     pdfDoc.pipe(res);

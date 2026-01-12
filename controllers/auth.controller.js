@@ -1,6 +1,8 @@
 import {
   registerUserService,
-  loginUserService
+  loginUserService,
+  getUserProfileService,
+  updateUserProfileService
 } from "../services/index.js";
 
 /**
@@ -35,8 +37,39 @@ export const loginUser = async (req, res, next) => {
   }
 };
 
+/**
+ * -----------------------------------------------------
+ * Get User Profile Controller
+ * -----------------------------------------------------
+ */
+export const getUserProfile = async (req, res, next) => {
+  try {
+    const profile = await getUserProfileService(req.user._id);
+    res.status(200).json(profile);
+  } catch (error) {
+    next(error);
+  }
+};
 
-
+/**
+ * -----------------------------------------------------
+ * Update User Profile Controller
+ * -----------------------------------------------------
+ */
+export const updateUserProfile = async (req, res, next) => {
+  try {
+    const updatedProfile = await updateUserProfileService(
+      req.user._id,
+      req.body
+    );
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: updatedProfile
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 
 
