@@ -15,7 +15,7 @@ export {
 } from "./auth.controller.js";
 
 // Stock Controllers
-export { getAllStocks, getStockById } from "./stock.controller.js";
+export { getAllStocks, getStockById, getSectors } from "./stock.controller.js";
 
 // Transaction Controllers
 export {

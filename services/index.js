@@ -11,7 +11,8 @@ export {
 
 export {
   getStocksService,
-  getStockByIdService
+  getStockByIdService,
+  getSectorsService
 } from "./stock.service.js";
 
 export {

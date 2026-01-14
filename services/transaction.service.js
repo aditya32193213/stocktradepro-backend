@@ -182,37 +182,85 @@ export const sellStockService = async (userId, stockId, quantity, notes = "") =>
  * -----------------------------------------------------
  */
 export const getTransactionsService = async (userId, filters = {}) => {
-  const { type, stockId, fromDate, toDate, page = 1, limit = 20 } = filters;
+  const { type, search, fromDate, toDate, page = 1, limit = 20 } = filters;
 
-  const query = { user: userId };
+  const matchStage = { user: new mongoose.Types.ObjectId(userId) };
 
-  if (type) query.type = type;
-  if (stockId) query.stock = stockId;
-  if (fromDate && toDate) {
-    query.createdAt = {
-      $gte: new Date(fromDate),
-      $lte: new Date(toDate),
-    };
+  // 1. Filter by Type
+  if (type && type !== "ALL") {
+    matchStage.type = type;
+  }
+
+  // 2. Filter by Date
+  if (fromDate || toDate) {
+    matchStage.createdAt = {};
+    if (fromDate) matchStage.createdAt.$gte = new Date(fromDate);
+    if (toDate) {
+      const end = new Date(toDate);
+      end.setHours(23, 59, 59, 999);
+      matchStage.createdAt.$lte = end;
+    }
+  }
+
+  const pipeline = [
+    { $match: matchStage },
+    // Join with Stock to get Symbol/Name for searching
+    {
+      $lookup: {
+        from: "stocks",
+        localField: "stock",
+        foreignField: "_id",
+        as: "stockDetails"
+      }
+    },
+    { $unwind: "$stockDetails" },
+    { $sort: { createdAt: -1 } }
+  ];
+
+  // 3. Search by Symbol or Company Name
+  if (search) {
+    pipeline.push({
+      $match: {
+        $or: [
+          { "stockDetails.symbol": { $regex: search, $options: "i" } },
+          { "stockDetails.companyName": { $regex: search, $options: "i" } }
+        ]
+      }
+    });
   }
 
   const skip = (page - 1) * limit;
 
-  const [transactions, totalRecords] = await Promise.all([
-    Transaction.find(query)
-      .populate("stock", "symbol companyName logoUrl")
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(Number(limit))
-      .lean(),
-    Transaction.countDocuments(query),
+  const [data, totalCount] = await Promise.all([
+    Transaction.aggregate([
+      ...pipeline, 
+      { $skip: Number(skip) }, 
+      { $limit: Number(limit) },
+      // Project fields to match previous format
+      {
+         $project: {
+            user: 1,
+            type: 1,
+            quantity: 1,
+            price: 1,
+            totalAmount: 1,
+            notes: 1,
+            createdAt: 1,
+            stock: "$stockDetails" // Map stockDetails back to 'stock'
+         }
+      }
+    ]),
+    Transaction.aggregate([...pipeline, { $count: "count" }])
   ]);
+
+  const totalRecords = totalCount[0]?.count || 0;
 
   return {
     page: Number(page),
     pageSize: Number(limit),
     totalPages: Math.ceil(totalRecords / limit),
     totalRecords,
-    data: transactions,
+    data
   };
 };
 

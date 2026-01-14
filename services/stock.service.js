@@ -8,6 +8,9 @@ import { AppError } from "../utils/index.js";
  * Handles stock querying logic.
  */
 
+/**
+ * Get Stocks with Pagination, Search, and Filtering
+ */
 export const getStocksService = async (queryParams) => {
   const {
     page = 1,
@@ -32,13 +35,13 @@ export const getStocksService = async (queryParams) => {
   const query = {};
 
   if (search) {
-  query.$or = [
-    { companyName: { $regex: search, $options: "i" } },
-    { symbol: { $regex: search, $options: "i" } }
-  ];
+    query.$or = [
+      { companyName: { $regex: search, $options: "i" } },
+      { symbol: { $regex: search, $options: "i" } }
+    ];
   }
 
-  if (sector) {
+  if (sector && sector !== "All Sectors") {
     query.sector = sector;
   }
 
@@ -53,17 +56,29 @@ export const getStocksService = async (queryParams) => {
 
   return {
     page: sanitizedPage,
-    pageSize: sanitizedLimit,
+    limit: sanitizedLimit,
     totalPages: Math.ceil(totalRecords / sanitizedLimit),
     totalRecords,
     data: stocks
   };
 };
 
+/**
+ * Get Stock By ID
+ */
 export const getStockByIdService = async (id) => {
   const stock = await Stock.findById(id).lean();
   if (!stock) {
     throw new AppError("Stock not found", 404);
   }
   return stock;
+};
+
+/**
+ * Get Unique Sectors
+ */
+export const getSectorsService = async () => {
+  // Finds distinct sectors and sorts them
+  const sectors = await Stock.distinct("sector");
+  return sectors.sort();
 };

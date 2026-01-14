@@ -25,6 +25,7 @@ export const generateStockData = (company) => {
     symbol: company.symbol,
     companyName: company.companyName,
     sector: company.sector,
+    description: company.description,
 
     /**
      * Primary logo source:

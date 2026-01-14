@@ -17,6 +17,7 @@ import app from "./app.js";
 import connectDB from "./config/db.js";
 import { validateEnv } from "./utils/index.js";
 import { logger } from "./utils/index.js";
+import { startMarketSimulation } from "./utils/index.js";
 
 
 // Validate required environment variables
@@ -52,6 +53,7 @@ const startServer = async () => {
       logger.info("🌐 Base URL", { url: BASE_URL });
       logger.info("📘 API Docs", {url: `${BASE_URL}/api-docs`,});
       logger.info("❤️ Health Check", {url: `${BASE_URL}/api/v1/health`,});
+      startMarketSimulation();
 });
   } catch (error) {
     logger.error("❌ Failed to start server", error);

@@ -46,7 +46,6 @@ const transactionSchema = new mongoose.Schema(
     // NEW: Optional notes for transactions
     notes: {
       type: String,
-      maxlength: 500,
       trim: true,
       default: ""
     }

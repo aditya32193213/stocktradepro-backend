@@ -1,5 +1,5 @@
 import express from "express";
-import { getAllStocks, getStockById } from "../../controllers/index.js";
+import { getAllStocks, getStockById ,getSectors} from "../../controllers/index.js";
 import { validate } from "../../middleware/index.js";   
 import { getStocksValidation, getStockByIdValidation } from "../../validations/index.js";
 const router = express.Router();
@@ -54,6 +54,18 @@ const router = express.Router();
  *         description: Paginated list of stocks
  */
 router.get("/", getStocksValidation, validate, getAllStocks);
+
+/**
+ * @swagger
+ * /stocks/sectors:
+ *  get:
+ *      summary: Get list of stock sectors
+ *      tags: [Stocks]
+ *      responses:
+ *          200:
+ *            description: List of unique sectors
+ */
+router.get("/sectors", getSectors); // ✅ ADDED THIS ROUTE (Must be before /:id) 
 
 /**
  * @swagger

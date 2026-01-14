@@ -1,11 +1,10 @@
-/**
- * -----------------------------------------------------
- * Stock Schema
- * -----------------------------------------------------
- * Represents a tradable stock in the system.
- * Optimized for listing, filtering, sorting, and search.
- */
-
+// /**
+//  * -----------------------------------------------------
+//  * Stock Schema
+//  * -----------------------------------------------------
+//  * Represents a tradable stock in the system.
+//  * Optimized for listing, filtering, sorting, and search.
+//  */
 import mongoose from "mongoose";
 
 const stockSchema = new mongoose.Schema(
@@ -17,54 +16,49 @@ const stockSchema = new mongoose.Schema(
       uppercase: true,
       index: true
     },
-
     companyName: {
       type: String,
       required: true
     },
-
+    description: {
+      type: String, 
+      default: "A leading player in its sector, consistently delivering value to shareholders."
+    },
     sector: {
       type: String,
       required: true,
       index: true
     },
-
     logoUrl: {
       type: String,
       required: true
     },
-
     price: {
       type: Number,
       required: true
     },
-
+    // ✅ NEW: Store yesterday's close price to calculate daily change
+    previousClose: {
+      type: Number,
+      default: function() { return this.price; } 
+    },
     changePercent: {
       type: Number,
       default: 0
     },
-
-    volume: {
-      type: Number,
-      default: 0
-    },
-
-    peRatio: {
-      type: Number
-    },
-
-    marketCap: {
-      type: Number
-    }
+    // ✅ NEW: History Array for the Graph
+    history: [
+      {
+        price: Number,
+        timestamp: { type: Date, default: Date.now }
+      }
+    ],
+    volume: { type: Number, default: 0 },
+    peRatio: { type: Number },
+    marketCap: { type: Number }
   },
   { timestamps: true }
 );
-
-/**
- * -----------------------------------------------------
- * Indexes
- * -----------------------------------------------------
- */
 
 // Compound index for sector-based ranking
 stockSchema.index({ sector: 1, marketCap: -1 });
