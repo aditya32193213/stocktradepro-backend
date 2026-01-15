@@ -68,7 +68,7 @@ export const transactionLimiter = isTest
 
 /**
  * -----------------------------------------------------
- * General API Rate Limiter (RESTORED)
+ * General API Rate Limiter 
  * -----------------------------------------------------
  */
 export const apiLimiter = isTest
