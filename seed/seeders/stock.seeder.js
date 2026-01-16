@@ -9,7 +9,7 @@
  * Used for demo and development environments only.
  */
 
-import Stock from "../../models/Stock.js";
+import  Stock  from "../../models/Stock.js";
 import { companies } from "../data/companies.js";
 import { generateStockData } from "../utils/generateStock.js";
 
