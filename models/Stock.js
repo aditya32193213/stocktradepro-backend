@@ -31,7 +31,8 @@ const stockSchema = new mongoose.Schema(
     },
     logoUrl: {
       type: String,
-      required: true
+      trim: true,
+      default :null
     },
     price: {
       type: Number,

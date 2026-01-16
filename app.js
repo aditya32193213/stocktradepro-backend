@@ -10,7 +10,7 @@ import { logger } from "./utils/index.js";
 import { requestLogger } from "./middleware/index.js";
 
 const app = express();
-
+const isProd = process.env.NODE_ENV === "production";
 app.use(requestId);
 /**
  * -----------------------------------------------------
@@ -34,16 +34,18 @@ app.set("trust proxy", 1);
 // Security headers with proper CSP
 app.use(
   helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        scriptSrc: ["'self'"],
-        imgSrc: ["'self'", "data:", "https:"],
-      },
-    },
+    contentSecurityPolicy: isProd
+      ? {
+          directives: {
+            defaultSrc: ["'self'"],
+            connectSrc: ["'self'", process.env.FRONTEND_URL],
+            imgSrc: ["'self'", "data:", "https:"],
+          },
+        }
+      : false,
   })
 );
+
 
 // Gzip compression for better performance
 app.use(compression());

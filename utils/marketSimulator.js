@@ -48,7 +48,7 @@ export const startMarketSimulation = () => {
       await Promise.all(updates);
       
     } catch (error) {
-      console.error("⚠️ Market Simulation Error:", error.message);
+      logger.warn("⚠️ Market Simulation Error:", error.message);
     }
   }, 5000); // Updates every 5 seconds
 };
